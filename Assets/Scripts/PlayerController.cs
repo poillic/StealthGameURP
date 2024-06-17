@@ -51,27 +51,26 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = _moveAction.ReadValue<Vector2>();
 
-        if ( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
-        {
-            _rb.MovePosition( hit.point + new Vector3( 0f, rayLength, 0f ) );
-        }
-
         CheckGround();
         OnStateUpdate();
     }
 
     private void FixedUpdate()
     {
-        if( isGrounded )
+        Vector3 vel = new Vector3( moveDirection.x * _currentSpeed, _rb.velocity.y, moveDirection.y * _currentSpeed );
+
+        if ( isGrounded )
         {
             _rb.useGravity = false;
+            vel.y = 0f;
         }
         else
         {
             _rb.useGravity = true;
+            vel.y = _rb.velocity.y;
         }
 
-        _rb.velocity = new Vector3( moveDirection.x * _currentSpeed, _rb.velocity.y, moveDirection.y * _currentSpeed );
+        _rb.velocity = vel;
     }
 
     public void CheckGround()
@@ -80,6 +79,14 @@ public class PlayerController : MonoBehaviour
 
         isGrounded = bodies.Length > 0;
 
+    }
+
+    public void StickToGround()
+    {
+        if ( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
+        {
+            _rb.MovePosition( hit.point + new Vector3( 0f, rayLength, 0f ) );
+        }
     }
 
     private void OnDrawGizmos()
@@ -93,7 +100,7 @@ public class PlayerController : MonoBehaviour
             Gizmos.color = Color.red;
         }
 
-        Gizmos.DrawCube( checkGroundTransform.position, checkGroundDimension );
+        Gizmos.DrawCube( checkGroundTransform.position, checkGroundDimension*2f );
 
         Gizmos.color = Color.magenta;
         Gizmos.DrawRay( transform.position, Vector3.down * rayLength );
@@ -130,6 +137,8 @@ public class PlayerController : MonoBehaviour
         {
             case PlayerState.IDLE:
 
+                StickToGround();
+
                 if ( moveDirection.magnitude > 0f )
                 {
                     TransitionToState( PlayerState.JOG );
@@ -153,6 +162,8 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.JOG:
 
+                StickToGround();
+
                 if ( _runAction.WasPerformedThisFrame() && moveDirection.magnitude > 0f )
                 {
                     TransitionToState( PlayerState.RUN );
@@ -168,7 +179,9 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.RUN:
 
-                if( moveDirection.magnitude == 0f )
+                StickToGround();
+
+                if ( moveDirection.magnitude == 0f )
                 {
                     TransitionToState( PlayerState.IDLE );
                 }
@@ -187,8 +200,8 @@ public class PlayerController : MonoBehaviour
 
                 break;
             case PlayerState.SNEAK:
-
-                if( _sneakAction.WasPerformedThisFrame() )
+                StickToGround();
+                if ( _sneakAction.WasPerformedThisFrame() )
                 {
                     if( moveDirection.magnitude > 0f )
                     {
