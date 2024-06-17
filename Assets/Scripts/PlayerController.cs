@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     public PlayerDataSO playerDatas;
     public Rigidbody _rb;
 
+    [Header( "Ground Position" )]
+    public float rayLength;
 
     [Header( "Check Ground" )]
     public Transform checkGroundTransform;
@@ -49,12 +51,26 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = _moveAction.ReadValue<Vector2>();
 
+        if ( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
+        {
+            _rb.MovePosition( hit.point + new Vector3( 0f, rayLength, 0f ) );
+        }
+
         CheckGround();
         OnStateUpdate();
     }
 
     private void FixedUpdate()
     {
+        if( isGrounded )
+        {
+            _rb.useGravity = false;
+        }
+        else
+        {
+            _rb.useGravity = true;
+        }
+
         _rb.velocity = new Vector3( moveDirection.x * _currentSpeed, _rb.velocity.y, moveDirection.y * _currentSpeed );
     }
 
@@ -78,6 +94,9 @@ public class PlayerController : MonoBehaviour
         }
 
         Gizmos.DrawCube( checkGroundTransform.position, checkGroundDimension );
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawRay( transform.position, Vector3.down * rayLength );
     }
 
     public void OnStateEnter()
