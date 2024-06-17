@@ -573,34 +573,62 @@ MonoBehaviour:
     m_Flags: 0
   _runAction:
     m_Name: Run
-    m_Type: 0
-    m_ExpectedControlType: 
+    m_Type: 1
+    m_ExpectedControlType: Button
     m_Id: ae9785bf-236a-4842-bfa4-67eaae343976
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 78d6e32d-1fd3-4e3c-83e4-9c021f2961c6
+      m_Path: <Keyboard>/leftShift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Run
+      m_Flags: 0
     m_Flags: 0
   _jumpAction:
     m_Name: Jump
-    m_Type: 0
-    m_ExpectedControlType: 
+    m_Type: 1
+    m_ExpectedControlType: Button
     m_Id: a935ec29-5658-418e-8365-2d1b29c06e7e
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: ba73ce93-4e5a-482c-9820-2528f9f24b74
+      m_Path: <Keyboard>/space
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Jump
+      m_Flags: 0
     m_Flags: 0
   _sneakAction:
     m_Name: Sneak
-    m_Type: 0
-    m_ExpectedControlType: 
+    m_Type: 1
+    m_ExpectedControlType: Button
     m_Id: 6ac6fb0c-6f81-4659-89b9-f03020144099
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: b3e98e8d-69c1-48c8-815d-b8c5f801165a
+      m_Path: <Keyboard>/c
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Sneak
+      m_Flags: 0
     m_Flags: 0
+  playerDatas: {fileID: 11400000, guid: ce541b9fabe2a32419d9acac783032dc, type: 2}
   _rb: {fileID: 400768952}
   checkGroundTransform: {fileID: 1483658133}
   checkGroundDimension: {x: 0.75, y: 0.25, z: 0.75}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
   currentState: 0
 --- !u!1 &410087039
 GameObject:

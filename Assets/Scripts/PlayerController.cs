@@ -11,7 +11,9 @@ public class PlayerController : MonoBehaviour
     public InputAction _jumpAction;
     public InputAction _sneakAction;
 
+    public PlayerDataSO playerDatas;
     public Rigidbody _rb;
+
 
     [Header( "Check Ground" )]
     public Transform checkGroundTransform;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isGrounded = true;
     private Vector2 moveDirection;
+    private float _currentSpeed;
 
     private void OnEnable()
     {
@@ -52,7 +55,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rb.velocity = new Vector3( moveDirection.x * 5f, _rb.velocity.y, moveDirection.y * 5f );
+        _rb.velocity = new Vector3( moveDirection.x * _currentSpeed, _rb.velocity.y, moveDirection.y * _currentSpeed );
     }
 
     public void CheckGround()
@@ -82,17 +85,20 @@ public class PlayerController : MonoBehaviour
         switch ( currentState )
         {
             case PlayerState.IDLE:
+                _currentSpeed = 0f;
                 break;
             case PlayerState.JOG:
+                _currentSpeed = playerDatas.jogSpeed;
                 break;
             case PlayerState.RUN:
+                _currentSpeed = playerDatas.runSpeed;
                 break;
             case PlayerState.SNEAK:
                 break;
             case PlayerState.FALL:
                 break;
             case PlayerState.JUMP:
-                _rb.AddForce( Vector3.up * 5f, ForceMode.Impulse );
+                _rb.AddForce( Vector3.up * playerDatas.jumpForce, ForceMode.Impulse );
                 break;
             default:
                 break;
@@ -104,7 +110,12 @@ public class PlayerController : MonoBehaviour
         switch ( currentState )
         {
             case PlayerState.IDLE:
-                if ( !isGrounded && _rb.velocity.y < 0f )
+
+                if ( moveDirection.magnitude > 0f )
+                {
+                    TransitionToState( PlayerState.JOG );
+                }
+                else if( !isGrounded && _rb.velocity.y < 0f )
                 {
                     TransitionToState( PlayerState.FALL );
                 }
@@ -112,7 +123,7 @@ public class PlayerController : MonoBehaviour
                 {
                     TransitionToState( PlayerState.RUN );
                 }
-                else if ( _jumpAction.WasPerformedThisFrame() )
+                else  if ( _jumpAction.WasPerformedThisFrame() )
                 {
                     TransitionToState( PlayerState.JUMP );
                 }
@@ -130,6 +141,9 @@ public class PlayerController : MonoBehaviour
                 else if ( _jumpAction.WasPerformedThisFrame() )
                 {
                     TransitionToState( PlayerState.JUMP );
+                }else if( moveDirection.magnitude == 0F )
+                {
+                    TransitionToState( PlayerState.IDLE );
                 }
 
                 break;
@@ -198,12 +212,30 @@ public class PlayerController : MonoBehaviour
 
     public void OnStateExit()
     {
-
+        switch ( currentState )
+        {
+            case PlayerState.IDLE:
+                break;
+            case PlayerState.JOG:
+                break;
+            case PlayerState.RUN:
+                break;
+            case PlayerState.SNEAK:
+                break;
+            case PlayerState.FALL:
+                break;
+            case PlayerState.JUMP:
+                break;
+            default:
+                break;
+        }
     }
 
     public void TransitionToState( PlayerState newState )
     {
-
+        OnStateExit();
+        currentState = newState;
+        OnStateEnter();
     }
 
 
