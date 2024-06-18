@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jogSpeed: 8
   runSpeed: 6
-  jumpForce: 5
+  jumpForce: 8

@@ -61,12 +61,10 @@ public class PlayerController : MonoBehaviour
         Vector3 moveRightLeft = Camera.main.transform.right * moveDirection.x;
         Vector3 moveForwardBackward = CameraForward * moveDirection.y;
         Vector3 direction = moveRightLeft + moveForwardBackward;
-        
-        Debug.Log( direction );
 
         Vector3 vel = new Vector3( direction.x * _currentSpeed, _rb.velocity.y, direction.z * _currentSpeed );
 
-        if ( isGrounded )
+        if ( isGrounded && _rb.velocity.y <= 0f )
         {
             _rb.useGravity = false;
             vel.y = 0f;
@@ -77,8 +75,6 @@ public class PlayerController : MonoBehaviour
             vel.y = _rb.velocity.y;
         }
 
-        
-
         _rb.velocity = vel;
     }
 
@@ -87,7 +83,6 @@ public class PlayerController : MonoBehaviour
         Collider[] bodies = Physics.OverlapBox( checkGroundTransform.position, checkGroundDimension,Quaternion.identity, groundLayer );
 
         isGrounded = bodies.Length > 0;
-
     }
 
     public void StickToGround()
@@ -243,6 +238,17 @@ public class PlayerController : MonoBehaviour
                 if( !isGrounded && _rb.velocity.y < 0f )
                 {
                     TransitionToState( PlayerState.FALL );
+                }
+                else if ( isGrounded )
+                {
+                    if ( moveDirection.magnitude > 0f )
+                    {
+                        TransitionToState( PlayerState.JOG );
+                    }
+                    else
+                    {
+                        TransitionToState( PlayerState.IDLE );
+                    }
                 }
 
                 break;
