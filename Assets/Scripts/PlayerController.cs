@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     public PlayerDataSO playerDatas;
     public Rigidbody _rb;
+    public Animator _animator;
 
     [Header( "Ground Position" )]
     public float rayLength;
@@ -51,6 +52,14 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = _moveAction.ReadValue<Vector2>();
 
+        _animator.SetFloat( "X", moveDirection.x * _currentSpeed / playerDatas.runSpeed );
+        _animator.SetFloat( "Y", moveDirection.y * _currentSpeed / playerDatas.runSpeed );
+        /* BREATH OF THE WILD */
+        //_animator.SetFloat( "X", 0f );
+        //_animator.SetFloat( "Y", moveDirection.magnitude * _currentSpeed / playerDatas.runSpeed );
+        _animator.SetFloat( "velocityY", _rb.velocity.y );
+        _animator.SetBool( "isGrounded", isGrounded );
+
         CheckGround();
         OnStateUpdate();
     }
@@ -75,6 +84,13 @@ public class PlayerController : MonoBehaviour
             vel.y = _rb.velocity.y;
         }
 
+
+        if ( moveDirection.magnitude > 0f )
+        {
+            transform.forward = CameraForward;
+            /* BREATH OF THE WILD */
+            //transform.forward = direction;
+        }
         _rb.velocity = vel;
     }
 
@@ -119,6 +135,7 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.JOG:
                 _currentSpeed = playerDatas.jogSpeed;
+                
                 break;
             case PlayerState.RUN:
                 _currentSpeed = playerDatas.runSpeed;
