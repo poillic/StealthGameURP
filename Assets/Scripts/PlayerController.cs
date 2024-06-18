@@ -57,7 +57,14 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 vel = new Vector3( moveDirection.x * _currentSpeed, _rb.velocity.y, moveDirection.y * _currentSpeed );
+        Vector3 CameraForward = new Vector3( Camera.main.transform.forward.x, 0f, Camera.main.transform.forward.z ).normalized;
+        Vector3 moveRightLeft = Camera.main.transform.right * moveDirection.x;
+        Vector3 moveForwardBackward = CameraForward * moveDirection.y;
+        Vector3 direction = moveRightLeft + moveForwardBackward;
+        
+        Debug.Log( direction );
+
+        Vector3 vel = new Vector3( direction.x * _currentSpeed, _rb.velocity.y, direction.z * _currentSpeed );
 
         if ( isGrounded )
         {
@@ -69,6 +76,8 @@ public class PlayerController : MonoBehaviour
             _rb.useGravity = true;
             vel.y = _rb.velocity.y;
         }
+
+        
 
         _rb.velocity = vel;
     }
