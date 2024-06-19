@@ -7,5 +7,6 @@ public class PlayerDataSO : ScriptableObject
 {
     public float jogSpeed;
     public float runSpeed;
+    public float sneakSpeed;
     public float jumpForce;
 }

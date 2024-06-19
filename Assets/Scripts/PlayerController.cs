@@ -50,6 +50,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        checkGroundTransform.localPosition = new Vector3( checkGroundTransform.localPosition.x, -rayLength, checkGroundTransform.localPosition.z );
+
         moveDirection = _moveAction.ReadValue<Vector2>();
 
         _animator.SetFloat( "X", moveDirection.x * _currentSpeed / playerDatas.runSpeed );
@@ -135,12 +138,13 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.JOG:
                 _currentSpeed = playerDatas.jogSpeed;
-                
                 break;
             case PlayerState.RUN:
                 _currentSpeed = playerDatas.runSpeed;
                 break;
             case PlayerState.SNEAK:
+                _animator.SetBool( "isSneak", true );
+                _currentSpeed = playerDatas.sneakSpeed;
                 break;
             case PlayerState.FALL:
                 break;
@@ -196,7 +200,10 @@ public class PlayerController : MonoBehaviour
                 {
                     TransitionToState( PlayerState.IDLE );
                 }
-
+                else if ( _sneakAction.WasPerformedThisFrame() )
+                {
+                    TransitionToState( PlayerState.SNEAK );
+                }
                 break;
             case PlayerState.RUN:
 
@@ -218,7 +225,10 @@ public class PlayerController : MonoBehaviour
                 {
                     TransitionToState( PlayerState.JUMP );
                 }
-
+                else if ( _sneakAction.WasPerformedThisFrame() )
+                {
+                    TransitionToState( PlayerState.SNEAK );
+                }
                 break;
             case PlayerState.SNEAK:
                 StickToGround();
@@ -232,12 +242,15 @@ public class PlayerController : MonoBehaviour
                     {
                         TransitionToState( PlayerState.IDLE );
                     }
+                }else if ( moveDirection.magnitude > 0f && _runAction.WasPerformedThisFrame() )
+                {
+                    TransitionToState( PlayerState.RUN );
                 }
 
                 break;
             case PlayerState.FALL:
 
-                if( isGrounded )
+                if( isGrounded && _rb.velocity.y == 0f )
                 {
                     if( moveDirection.magnitude > 0f )
                     {
@@ -252,20 +265,9 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.JUMP:
 
-                if( !isGrounded && _rb.velocity.y < 0f )
+                if( !isGrounded && _rb.velocity.y <= 0f )
                 {
                     TransitionToState( PlayerState.FALL );
-                }
-                else if ( isGrounded )
-                {
-                    if ( moveDirection.magnitude > 0f )
-                    {
-                        TransitionToState( PlayerState.JOG );
-                    }
-                    else
-                    {
-                        TransitionToState( PlayerState.IDLE );
-                    }
                 }
 
                 break;
@@ -285,6 +287,7 @@ public class PlayerController : MonoBehaviour
             case PlayerState.RUN:
                 break;
             case PlayerState.SNEAK:
+                _animator.SetBool( "isSneak", false );
                 break;
             case PlayerState.FALL:
                 break;
