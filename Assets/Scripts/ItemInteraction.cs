@@ -38,9 +38,9 @@ public class ItemInteraction : MonoBehaviour
             {
                 crosshair.color = crossHairOn;
 
+                //Si l'objet que l'on survole est différent du précédent
                 if( item != null && hit.collider.GetComponent<Interactive>() != item )
                 {
-                    item.interactText = "Orvaor";
                     item = hit.collider.GetComponent<Interactive>();
                 }
 
@@ -48,8 +48,7 @@ public class ItemInteraction : MonoBehaviour
 
                 if( item != null )
                 {
-                    item.interactText = "Hover";
-                    //tooltip.text = item.interactText;
+                    tooltip.text = item.interactText;
                     if ( interactAction.WasPerformedThisFrame() )
                     {
                         item.Use();
@@ -58,17 +57,19 @@ public class ItemInteraction : MonoBehaviour
             }
             else
             {
+                //On ne survole pas d'objet
                 TurnOff();
             }
         }
         else
         {
+            //On ne survole pas d'objet donc on remet l'objet que l'on survole à null
             if( item != null )
             {
-                item.interactText = "salut";
                 item = null;
             }
 
+            //On ne survole pas d'objet
             TurnOff();
         }
     }
