@@ -41,6 +41,8 @@ public class ItemInteraction : MonoBehaviour
                 //Si l'objet que l'on survole est différent du précédent
                 if( item != null && hit.collider.GetComponent<Interactive>() != item )
                 {
+                    //OUTLINE / COLOR SWAP : On remet la couleur de l'objet par défaut
+                    item.GetComponent<MeshRenderer>().material.color = Color.grey;
                     item = hit.collider.GetComponent<Interactive>();
                 }
 
@@ -49,6 +51,9 @@ public class ItemInteraction : MonoBehaviour
                 if( item != null )
                 {
                     tooltip.text = item.interactText;
+
+                    //OUTLINE / COLOR SWAP : On change la couleur de l'objet survolé
+                    hit.collider.GetComponent<MeshRenderer>().material.color = Color.green;
                     if ( interactAction.WasPerformedThisFrame() )
                     {
                         item.Use();
@@ -66,6 +71,8 @@ public class ItemInteraction : MonoBehaviour
             //On ne survole pas d'objet donc on remet l'objet que l'on survole à null
             if( item != null )
             {
+                //OUTLINE / COLOR SWAP : On remet la couleur de l'objet par défaut
+                item.GetComponent<MeshRenderer>().material.color = Color.grey;
                 item = null;
             }
 
