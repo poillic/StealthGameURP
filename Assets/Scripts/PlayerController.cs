@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private Vector2 moveDirection;
     private float _currentSpeed;
-
+    private bool slope = false;
     private void OnEnable()
     {
         _moveAction.Enable();
@@ -87,6 +87,7 @@ public class PlayerController : MonoBehaviour
             vel.y = _rb.velocity.y;
         }
 
+        //_rb.useGravity = slope;
 
         if ( moveDirection.magnitude > 0f )
         {
@@ -101,7 +102,13 @@ public class PlayerController : MonoBehaviour
     {
         Collider[] bodies = Physics.OverlapBox( checkGroundTransform.position, checkGroundDimension,Quaternion.identity, groundLayer );
 
-        isGrounded = bodies.Length > 0;
+        if( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
+        {
+            Debug.Log( Vector3.Angle( Vector3.up, hit.normal ) );
+            slope = Vector3.Angle( Vector3.up, hit.normal ) > 45f;
+        }
+
+        isGrounded = bodies.Length > 0 && !slope;
     }
 
     public void StickToGround()
@@ -109,6 +116,11 @@ public class PlayerController : MonoBehaviour
         if ( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
         {
             _rb.MovePosition( hit.point + new Vector3( 0f, rayLength, 0f ) );
+
+        }
+        else
+        {
+            slope = false;
         }
     }
 
@@ -147,6 +159,7 @@ public class PlayerController : MonoBehaviour
                 _currentSpeed = playerDatas.sneakSpeed;
                 break;
             case PlayerState.FALL:
+                _currentSpeed = 0f;
                 break;
             case PlayerState.JUMP:
                 _rb.AddForce( Vector3.up * playerDatas.jumpForce, ForceMode.Impulse );
@@ -168,7 +181,7 @@ public class PlayerController : MonoBehaviour
                 {
                     TransitionToState( PlayerState.JOG );
                 }
-                else if( !isGrounded && _rb.velocity.y < 0f )
+                else if( !isGrounded )
                 {
                     TransitionToState( PlayerState.FALL );
                 }
@@ -204,6 +217,11 @@ public class PlayerController : MonoBehaviour
                 {
                     TransitionToState( PlayerState.SNEAK );
                 }
+                else if ( !isGrounded )
+                {
+                    TransitionToState( PlayerState.FALL );
+                }
+
                 break;
             case PlayerState.RUN:
 
