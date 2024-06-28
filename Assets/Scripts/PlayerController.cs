@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private Vector2 moveDirection;
     private float _currentSpeed;
-    private bool slope = false;
+    private float slope = 1f;
     private void OnEnable()
     {
         _moveAction.Enable();
@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
         _animator.SetFloat( "velocityY", _rb.velocity.y );
         _animator.SetBool( "isGrounded", isGrounded );
 
+       
+
         CheckGround();
         OnStateUpdate();
     }
@@ -74,7 +76,7 @@ public class PlayerController : MonoBehaviour
         Vector3 moveForwardBackward = CameraForward * moveDirection.y;
         Vector3 direction = moveRightLeft + moveForwardBackward;
 
-        Vector3 vel = new Vector3( direction.x * _currentSpeed, _rb.velocity.y, direction.z * _currentSpeed );
+        Vector3 vel = new Vector3( direction.x * _currentSpeed * slope, _rb.velocity.y, direction.z * _currentSpeed * slope );
 
         if ( isGrounded && _rb.velocity.y <= 0f )
         {
@@ -102,13 +104,29 @@ public class PlayerController : MonoBehaviour
     {
         Collider[] bodies = Physics.OverlapBox( checkGroundTransform.position, checkGroundDimension,Quaternion.identity, groundLayer );
 
-        if( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength, groundLayer ) )
+        if ( Physics.Raycast( transform.position, Vector3.down, out RaycastHit hit, rayLength +0.1f, groundLayer ) )
         {
-            Debug.Log( Vector3.Angle( Vector3.up, hit.normal ) );
-            slope = Vector3.Angle( Vector3.up, hit.normal ) > 45f;
+
+            Debug.Log( hit.collider );
+
+            if ( Vector3.Angle( Vector3.up, hit.normal ) > 60f )
+            {
+                slope = 0f;
+            }
+            else
+            {
+                Debug.Log( Vector3.Dot( Vector3.up, hit.normal ) );
+                slope = Vector3.Dot( Vector3.up, hit.normal );
+            }
+
+            isGrounded = hit.collider != null && slope > 0f;
+        }
+        else
+        {
+            isGrounded = false;
         }
 
-        isGrounded = bodies.Length > 0 && !slope;
+        
     }
 
     public void StickToGround()
@@ -117,10 +135,6 @@ public class PlayerController : MonoBehaviour
         {
             _rb.MovePosition( hit.point + new Vector3( 0f, rayLength, 0f ) );
 
-        }
-        else
-        {
-            slope = false;
         }
     }
 
